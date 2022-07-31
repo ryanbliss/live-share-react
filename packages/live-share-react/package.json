@@ -1,0 +1,33 @@
+{
+  "name": "@microsoft/live-share-react",
+  "version": "0.3.1",
+  "main": "./bin/index.js",
+  "types": "./bin/index.d.ts",
+  "scripts": {
+    "clean": "npx shx rm -rf bin",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@fluidframework/azure-client": "~0.59.0",
+    "@microsoft/live-share": "~0.3.1",
+    "@microsoft/live-share-media": "~0.3.1",
+    "@microsoft/teams-js": "2.0.0-experimental.0",
+    "fluid-framework": "~0.59.0",
+    "url": "^0.11.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.3",
+    "@fluidframework/test-client-utils": "~0.59.0",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/uuid": "^8.3.4",
+    "babel-loader": "^7.1.5",
+    "typescript": "^4.6.4"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0 || ^17 || ^18",
+    "react-dom": "^16.8.0 || ^17 || ^18"
+  }
+}
