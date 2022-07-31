@@ -1,0 +1,34 @@
+{
+  "name": "fluid-react",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "start": "start-server-and-test start:server 7070 vite",
+    "start:server": "npx @fluidframework/azure-local-service@latest",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fluidframework/azure-client": "~0.59.0",
+    "@microsoft/live-share": "~0.3.1",
+    "@microsoft/live-share-media": "~0.3.1",
+    "@microsoft/live-share-react": "~0.3.1",
+    "@microsoft/teams-js": "2.0.0-experimental.0",
+    "fluid-framework": "~0.59.0",
+    "react": "^17.0.0",
+    "react-dom": "^17.0.0",
+    "url": "^0.11.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@fluidframework/test-client-utils": "~0.59.0",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/uuid": "^8.3.4",
+    "@vitejs/plugin-react": "^2.0.0",
+    "start-server-and-test": "^1.11.6",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.0"
+  }
+}
