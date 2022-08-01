@@ -9,7 +9,7 @@ import {
   MediaSessionCoordinatorSuspension,
 } from "@microsoft/live-share-media";
 import { isExtendedMediaMetadata, isMediaElement, isRefObject } from "../utils";
-import { useDynamicDDS } from "./useDynamicDDS";
+import { useDynamicDDS } from "../shared-hooks";
 import { IUseMediaSynchronizerResults } from "../types";
 
 export function useMediaSynchronizer(

@@ -1,7 +1,7 @@
 import { EphemeralState, UserMeetingRole } from "@microsoft/live-share";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SetEphemeralStateAction } from "../types";
-import { useDynamicDDS } from "./useDynamicDDS";
+import { useDynamicDDS } from "../shared-hooks";
 
 interface IEphemeralStateStatus<
   TState extends string = string,

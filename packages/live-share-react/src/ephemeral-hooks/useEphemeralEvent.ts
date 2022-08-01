@@ -10,7 +10,7 @@ import {
   SendEphemeralEventAction,
 } from "../types";
 import { IReceiveEphemeralEvent } from "../interfaces";
-import { useDynamicDDS } from "./useDynamicDDS";
+import { useDynamicDDS } from "../shared-hooks";
 
 /**
  * React hook for using a Live Share `EphemeralEvent`.
