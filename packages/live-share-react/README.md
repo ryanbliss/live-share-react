@@ -80,7 +80,7 @@ The following example shows how `useSharedState` can be used to dynamically crea
 ```javascript
 import { useSharedState } from "@microsoft/live-share-react";
 
-export const CounterCard = ({ card, onDelete }) => {
+export function CounterCard({ card, onDelete }) {
   const [count, setCount, disposeCount] = useSharedState(
     `card-count:${card.id}`,
     0
@@ -106,7 +106,7 @@ export const CounterCard = ({ card, onDelete }) => {
       </button>
     </div>
   );
-};
+}
 ```
 
 _NOTE:_ While this hook will get you pretty far on its own, carefully consider which of our React hook is best for your scenario.
@@ -121,7 +121,7 @@ While you write to keys individually, the `map` object exposed through the hook 
 import { useSharedMap } from "@microsoft/live-share-react";
 import { v4 as uuid } from "uuid";
 
-export const ExampleSharedMap = () => {
+export function ExampleSharedMap() {
   const { map, setEntry, deleteEntry } = useSharedMap("CUSTOM-MAP-ID");
   return (
     <div>
@@ -148,7 +148,7 @@ export const ExampleSharedMap = () => {
       </div>
     </div>
   );
-};
+}
 ```
 
 ### useEphemeralPresence
@@ -159,7 +159,7 @@ Presence makes it easy to track which users are currently in the session and ass
 import { useEphemeralPresence } from "@microsoft/live-share-react";
 import { PresenceState } from "@microsoft/live-share";
 
-export const ExampleEphemeralPresence = () => {
+export function ExampleEphemeralPresence() {
   const { localUser, allUsers, updatePresence } = useEphemeralPresence(
     "CUSTOM-USER-ID", // optional user id
     { name: "First Last" } // optional custom data object
@@ -188,7 +188,7 @@ export const ExampleEphemeralPresence = () => {
       </button>
     </div>
   );
-};
+}
 ```
 
 ### useEphemeralState
@@ -203,7 +203,7 @@ import { UserMeetingRole } from "@microsoft/live-share";
 
 const ALLOWED_ROLES = [UserMeetingRole.organizer, UserMeetingRole.presenter ];
 
-export const ExampleEphemeralState = () => {
+export function ExampleEphemeralState() {
   const [state, data, setState] = useEphemeralState("CUSTOM-STATE-ID", ALLOWED_ROLES, ExampleAppState.WAITING);
 
   if (state === ExampleAppState.WAITING) {
@@ -246,7 +246,7 @@ Here is a simple example:
 ```javascript
 import { useEphemeralEvent } from "@microsoft/live-share-react";
 
-export const ExampleEphemeralEvent = () => {
+export function ExampleEphemeralEvent() {
   const { latestEvent, sendEvent } = useEphemeralEvent("EVENT-ID");
 
   return (
@@ -275,7 +275,7 @@ export const ExampleEphemeralEvent = () => {
       )}
     </div>
   );
-};
+}
 ```
 
 ### useMediaSynchronizer
@@ -294,7 +294,7 @@ const ALLOWED_ROLES = [UserMeetingRole.organizer, UserMeetingRole.presenter];
 const INITIAL_TRACK =
   "https://storage.googleapis.com/media-session/big-buck-bunny/trailer.mov";
 
-export const ExampleMediaSynchronizer = () => {
+export function ExampleMediaSynchronizer() {
   const videoRef = useRef(null);
   const { play, pause } = useMediaSynchronizer(
     "MEDIA-SESSION-ID",
@@ -310,7 +310,7 @@ export const ExampleMediaSynchronizer = () => {
       <button onClick={pause}>{"Pause"}</button>
     </div>
   );
-};
+}
 ```
 
 ### useDynamicDDS
