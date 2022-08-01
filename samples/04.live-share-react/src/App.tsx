@@ -3,12 +3,8 @@ import {
   FluidContextProvider,
   LiveShareContextProvider,
 } from "@microsoft/live-share-react";
-import {
-  AzureClient,
-  AzureConnectionConfig,
-} from "@fluidframework/azure-client";
+import { AzureConnectionConfig } from "@fluidframework/azure-client";
 import { inTeams } from "./utils/inTeams";
-import { TeamsFluidClient } from "@microsoft/live-share";
 import { useRef } from "react";
 import {
   ExampleEphemeralPresence,
