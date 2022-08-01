@@ -42,3 +42,10 @@ export type SetEphemeralStateAction<TState, TData> = (
   state: TState,
   value?: TData | undefined
 ) => void;
+
+export type SendEphemeralEventAction<TEvent> = (event: TEvent) => void;
+
+export type OnReceivedEphemeralEventAction<TEvent> = (
+  event: TEvent,
+  local: boolean
+) => void;
