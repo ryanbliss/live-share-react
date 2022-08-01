@@ -38,7 +38,7 @@ function getInitialData<TData>(
  * If you want to use `SharedMap` this hook creates directly, you can do that as well.
  *
  * @template TData Optional typing for objects stored in the SharedMap. Default is `object` type.
- * @param uniqueKey the unique key for the `SharedMap`. If one does not yet create, a new `SharedMap`
+ * @param uniqueKey the unique key for the `SharedMap`. If one does not yet exist, a new `SharedMap`
  * will be created, otherwise it will use the existing one.
  * @param initialData a JS Map, entries array, or JSON object to insert into the `SharedMap` when creating
  * the DDS for the first time.
@@ -151,6 +151,7 @@ export function useSharedMap<TData extends object = object>(
     };
   }, [container, initialData]);
 
+  // Setup change listeners, initial values, etc.
   useEffect(() => {
     if (listeningRef.current || !sharedMap) return;
     listeningRef.current = true;

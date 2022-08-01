@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { IFluidLoadable } from "@fluidframework/core-interfaces";
 import { LoadableObjectClass } from "fluid-framework";
+import { PresenceState } from "@microsoft/live-share";
 
 // React actions
 export type SetSharedStateAction<T> = (state: T) => void;
@@ -48,4 +49,9 @@ export type SendEphemeralEventAction<TEvent> = (event: TEvent) => void;
 export type OnReceivedEphemeralEventAction<TEvent> = (
   event: TEvent,
   local: boolean
+) => void;
+
+export type OnUpdateEphemeralPresenceAction<TData extends object = object> = (
+  state?: PresenceState | undefined,
+  data?: TData | undefined
 ) => void;

@@ -1,8 +1,17 @@
 import { AzureContainerServices } from "@fluidframework/azure-client";
-import { EphemeralEvent, IEphemeralEvent } from "@microsoft/live-share";
+import {
+  EphemeralEvent,
+  EphemeralPresence,
+  EphemeralPresenceUser,
+  IEphemeralEvent,
+  PresenceState,
+} from "@microsoft/live-share";
 import { IFluidContainer, SharedMap } from "fluid-framework";
 import { IReceiveEphemeralEvent } from "../interfaces";
-import { SendEphemeralEventAction } from "./ActionTypes";
+import {
+  OnUpdateEphemeralPresenceAction,
+  SendEphemeralEventAction,
+} from "./ActionTypes";
 
 export interface IAzureContainerResults {
   /**
@@ -58,4 +67,27 @@ export interface IUseEphemeralEventResults<TEvent extends object = object> {
    * The `EphemeralEvent` object, should you want to use it directly.
    */
   ephemeralEvent: EphemeralEvent | undefined;
+}
+
+export interface IUseEphemeralPresenceResults<TData extends object = object> {
+  /**
+   * The local user's presence object.
+   */
+  localUser: EphemeralPresenceUser<TData> | undefined;
+  /**
+   * List of non-local user's presence objects.
+   */
+  otherUsers: EphemeralPresenceUser<TData>[];
+  /**
+   * List of all user's presence objects.
+   */
+  allUsers: EphemeralPresenceUser<TData>[];
+  /**
+   * Live Share `EphemeralPresence` object, should you want to use it directly.
+   */
+  presence: EphemeralPresence<TData> | undefined;
+  /**
+   * Callback method to update the local user's presence.
+   */
+  updatePresence: OnUpdateEphemeralPresenceAction<TData>;
 }
