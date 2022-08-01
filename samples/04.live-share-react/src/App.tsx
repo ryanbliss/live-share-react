@@ -27,12 +27,12 @@ const localConnection: AzureConnectionConfig = {
   orderer: "http://localhost:7070",
   storage: "http://localhost:7070",
 };
-const client = new AzureClient({
+const azureClientOptions = {
   connection: localConnection,
-});
-const teamsClient = new TeamsFluidClient({
+};
+const teamsClientOptions = {
   connection: !inTeams() ? localConnection : undefined,
-});
+};
 
 export default function App() {
   // set to false to use AzureClient Fluid container
@@ -40,7 +40,7 @@ export default function App() {
   if (shouldUseLiveShare.current) {
     return (
       <LiveShareContextProvider
-        client={teamsClient}
+        clientOptions={teamsClientOptions}
         joinOnLoad={true}
         initializeTeamsSDKIfNeeded={true}
       >
@@ -64,7 +64,7 @@ export default function App() {
   }
   return (
     <FluidContextProvider
-      client={client}
+      clientOptions={azureClientOptions}
       createOnLoad={true}
       joinOnLoad={true}
       containerId={window.location.hash.substring(1)}
