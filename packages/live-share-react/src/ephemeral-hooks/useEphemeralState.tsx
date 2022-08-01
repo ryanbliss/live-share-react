@@ -86,7 +86,7 @@ export function useEphemeralState<
       console.log("stateChanged off");
       ephemeralState?.off("stateChanged", onStateChanged);
     };
-  }, [ephemeralState, initialState, initialData, allowedRoles]);
+  }, [ephemeralState]);
 
   return [current?.state, current?.data, changeState];
 }
