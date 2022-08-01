@@ -9,7 +9,7 @@ const INITIAL_TRACK =
 
 export const ExampleMediaSynchronizer: FC = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const { mediaSynchronizer, play, pause } = useMediaSynchronizer(
+  const { mediaSynchronizer, play, pause, seekTo } = useMediaSynchronizer(
     "MEDIA-SESSION-ID",
     videoRef,
     INITIAL_TRACK,
@@ -53,6 +53,13 @@ export const ExampleMediaSynchronizer: FC = () => {
           style={{ marginTop: "8px" }}
         >
           <button onClick={onTogglePlayPause}>{"Play/pause"}</button>
+          <button
+            onClick={() => {
+              seekTo(0);
+            }}
+          >
+            {"Start over"}
+          </button>
           <button
             onClick={() => {
               if (videoRef.current) {
