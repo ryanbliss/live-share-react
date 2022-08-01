@@ -1,5 +1,8 @@
 import { AzureContainerServices } from "@fluidframework/azure-client";
+import { EphemeralEvent, IEphemeralEvent } from "@microsoft/live-share";
 import { IFluidContainer, SharedMap } from "fluid-framework";
+import { IReceiveEphemeralEvent } from "../interfaces";
+import { SendEphemeralEventAction } from "./ActionTypes";
 
 export interface IAzureContainerResults {
   /**
@@ -36,4 +39,23 @@ export interface IUseSharedMapResults<TData> {
    * The Fluid `SharedMap` object, should you want to use it directly.
    */
   sharedMap: SharedMap | undefined;
+}
+
+export interface IUseEphemeralEventResults<TEvent extends object = object> {
+  /**
+   * The most recent event that has been received in the session.
+   */
+  latestEvent: IReceiveEphemeralEvent<TEvent> | undefined;
+  /**
+   * All received events since initializing this component, sorted from oldest -> newest.
+   */
+  allEvents: IReceiveEphemeralEvent<TEvent>[];
+  /**
+   * Callback method to send a new event to users in the session.
+   */
+  sendEvent: SendEphemeralEventAction<TEvent>;
+  /**
+   * The `EphemeralEvent` object, should you want to use it directly.
+   */
+  ephemeralEvent: EphemeralEvent | undefined;
 }

@@ -1,5 +1,8 @@
 import { InsecureTokenProvider } from "@fluidframework/test-client-utils";
-import { FluidContextProvider, LiveShareContextProvider } from "@microsoft/live-share-react";
+import {
+  FluidContextProvider,
+  LiveShareContextProvider,
+} from "@microsoft/live-share-react";
 import {
   AzureClient,
   AzureConnectionConfig,
@@ -13,6 +16,7 @@ import {
   ExampleEphemeralState,
   ExampleSharedState,
   ExampleMediaSynchronizer,
+  ExampleEphemeralEvent,
 } from "./components";
 
 const localConnection: AzureConnectionConfig = {
@@ -41,6 +45,7 @@ export default function App() {
             <>
               <h1>{"Welcome to Fluid React!"}</h1>
               <ExampleMediaSynchronizer />
+              <ExampleEphemeralEvent />
             </>
           }
           startContent={
