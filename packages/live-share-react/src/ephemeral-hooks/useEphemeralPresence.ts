@@ -4,9 +4,8 @@ import {
   PresenceState,
 } from "@microsoft/live-share";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useFluidObjectsContext } from "../providers";
-import { v4 as uuid } from "uuid";
 import { IUseEphemeralPresenceResults } from "../types";
+import { useDynamicDDS } from "./useDynamicDDS";
 
 /**
  * React hook for using a Live Share `EphemeralPresence`.
@@ -37,24 +36,16 @@ export function useEphemeralPresence<TData extends object = object>(
    */
   const listeningRef = useRef(false);
   /**
-   * User facing: Stateful `EphemeralPresence`, and non user-facing setter.
-   */
-  const [presence, setPresence] = useState<
-    EphemeralPresence<TData> | undefined
-  >();
-  /**
-   * Unique ID reference for the component.
-   */
-  const componentIdRef = useRef(uuid());
-  /**
    * Stateful all user presence list and its non-user-facing setter method.
    */
   const [allUsers, setAllUsers] = useState<EphemeralPresenceUser<TData>[]>([]);
   /**
-   * Import container and DDS object register callbacks from FluidContextProvider.
+   * User facing: dynamically load the EphemeralEvent DDS for the given unique key.
    */
-  const { container, registerDDSSetStateAction, unregisterDDSSetStateAction } =
-    useFluidObjectsContext();
+  const { dds: ephemeralPresence } = useDynamicDDS<EphemeralPresence<TData>>(
+    `<EphemeralPresence>:${uniqueKey}`,
+    EphemeralPresence<TData>
+  );
   /**
    * User facing: list of non-local user's presence objects.
    */
@@ -74,84 +65,43 @@ export function useEphemeralPresence<TData extends object = object>(
    */
   const updatePresence = useCallback(
     (state?: PresenceState | undefined, data?: TData | undefined) => {
-      if (!presence) {
+      if (!ephemeralPresence) {
         console.error(
           new Error("Cannot call updatePresence when presence is undefined")
         );
         return;
       }
-      if (!presence.isStarted) {
+      if (!ephemeralPresence.isStarted) {
         console.error(
           new Error("Cannot call updatePresence while presence is not started")
         );
         return;
       }
-      presence.updatePresence(state, data);
+      ephemeralPresence.updatePresence(state, data);
     },
-    [presence]
+    [ephemeralPresence]
   );
-
-  /**
-   * Once container is available, this effect will register the setter method so that the `EphemeralPresence` loaded
-   * from `dynamicObjects` that matches `uniqueKey` can be passed back to this hook. If one does not yet exist,
-   * a new `EphemeralPresence` is automatically created. If multiple users try to create a `EphemeralPresence` at the
-   * same time when this component first mounts, `registerDDSSetStateAction` ensures that the hook will ultimately
-   * self correct.
-   *
-   * @see registerDDSSetStateAction to see how DDS handles are attached/created for the `EphemeralPresence`.
-   * @see unregisterDDSSetStateAction to see how this component stops listening to changes in the DDS handles on unmount.
-   */
-  useEffect(() => {
-    if (!container) return;
-    console.log("presence dds on");
-    // Add type as a prefix for the key provided by the developer. This helps prevent typing conflicts.
-    const _uniqueKey = `<EphemeralPresence>:${uniqueKey}`;
-    // Callback method to set the `initialData` into the map when the `EphemeralPresence` is first created.
-    const registerDDS = () => {
-      registerDDSSetStateAction(
-        _uniqueKey,
-        componentIdRef.current,
-        EphemeralPresence<TData>,
-        setPresence
-      );
-      container.off("connected", registerDDS);
-    };
-    // Wait until connected event to ensure we have the latest document
-    // and don't accidentally override a dds handle recently created
-    // by another client
-    if (container.connectionState === 2) {
-      registerDDS();
-    } else {
-      container.on("connected", registerDDS);
-    }
-    return () => {
-      // On unmount, unregister set state action and container connected listener
-      console.log("presence dds off");
-      unregisterDDSSetStateAction(_uniqueKey, componentIdRef.current);
-      container.off("connected", registerDDS);
-    };
-  }, [container]);
 
   /**
    * Setup change listeners and start `EphemeralEvent` if needed
    */
   useEffect(() => {
-    if (listeningRef.current || !presence) return;
+    if (listeningRef.current || !ephemeralPresence) return;
     listeningRef.current = true;
 
     const onPresenceChanged = () => {
       const updatedLocalUsers: EphemeralPresenceUser<TData>[] = [];
-      presence?.forEach((user) => {
+      ephemeralPresence?.forEach((user) => {
         updatedLocalUsers.push(user);
       });
       setAllUsers(updatedLocalUsers);
     };
     console.log("presenceChanged on");
-    presence.on("presenceChanged", onPresenceChanged);
+    ephemeralPresence.on("presenceChanged", onPresenceChanged);
 
-    if (!presence.isStarted) {
+    if (!ephemeralPresence.isStarted) {
       console.log("starting presence");
-      presence.start(userId, initialData, initialPresenceState);
+      ephemeralPresence.start(userId, initialData, initialPresenceState);
     } else {
       console.log("presence already started, updating local cache");
       onPresenceChanged();
@@ -160,15 +110,15 @@ export function useEphemeralPresence<TData extends object = object>(
     return () => {
       listeningRef.current = false;
       console.log("presenceChanged off");
-      presence?.off("presenceChanged", onPresenceChanged);
+      ephemeralPresence?.off("presenceChanged", onPresenceChanged);
     };
-  }, [presence, userId, initialData, initialPresenceState]);
+  }, [ephemeralPresence]);
 
   return {
     localUser,
     otherUsers,
     allUsers,
-    presence,
+    ephemeralPresence,
     updatePresence,
   };
 }

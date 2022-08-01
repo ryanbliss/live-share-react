@@ -4,14 +4,13 @@ import {
   UserMeetingRole,
 } from "@microsoft/live-share";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useFluidObjectsContext } from "../providers";
-import { v4 as uuid } from "uuid";
 import {
   IUseEphemeralEventResults,
   OnReceivedEphemeralEventAction,
   SendEphemeralEventAction,
 } from "../types";
 import { IReceiveEphemeralEvent } from "../interfaces";
+import { useDynamicDDS } from "./useDynamicDDS";
 
 /**
  * React hook for using a Live Share `EphemeralEvent`.
@@ -37,14 +36,6 @@ export function useEphemeralEvent<TEvent extends object = object>(
    */
   const listeningRef = useRef(false);
   /**
-   * User facing: Stateful `EphemeralEvent`, and non user-facing setter.
-   */
-  const [ephemeralEvent, setEphemeralEvent] = useState<EphemeralEvent>();
-  /**
-   * Unique ID reference for the component.
-   */
-  const componentIdRef = useRef(uuid());
-  /**
    * Stateful latest event (user facing) and its non-user-facing setter method.
    */
   const [latestEvent, setLatestReceived] =
@@ -55,10 +46,12 @@ export function useEphemeralEvent<TEvent extends object = object>(
    */
   const allEventsRef = useRef<IReceiveEphemeralEvent<TEvent>[]>([]);
   /**
-   * Import container and DDS object register callbacks from FluidContextProvider.
+   * User facing: dynamically load the EphemeralEvent DDS for the given unique key.
    */
-  const { container, registerDDSSetStateAction, unregisterDDSSetStateAction } =
-    useFluidObjectsContext();
+  const { dds: ephemeralEvent } = useDynamicDDS<EphemeralEvent>(
+    `<EphemeralEvent>:${uniqueKey}`,
+    EphemeralEvent
+  );
 
   /**
    * User facing: callback to send event through `EphemeralEvent`
@@ -82,47 +75,6 @@ export function useEphemeralEvent<TEvent extends object = object>(
     },
     [ephemeralEvent]
   );
-
-  /**
-   * Once container is available, this effect will register the setter method so that the `EphemeralEvent` loaded
-   * from `dynamicObjects` that matches `uniqueKey` can be passed back to this hook. If one does not yet exist,
-   * a new `EphemeralEvent` is automatically created. If multiple users try to create a `EphemeralEvent` at the same
-   * time when this component first mounts, `registerDDSSetStateAction` ensures that the hook will ultimately
-   * self correct.
-   *
-   * @see registerDDSSetStateAction to see how DDS handles are attached/created for the `EphemeralEvent`.
-   * @see unregisterDDSSetStateAction to see how this component stops listening to changes in the DDS handles on unmount.
-   */
-  useEffect(() => {
-    if (!container) return;
-    console.log("EphemeralState dds on");
-    // Add type as a prefix for the key provided by the developer. This helps prevent typing conflicts.
-    const _uniqueKey = `<EphemeralEvent>:${uniqueKey}`;
-    // Callback method to set the `initialData` into the map when the `EphemeralEvent` is first created.
-    const registerDDS = () => {
-      registerDDSSetStateAction(
-        _uniqueKey,
-        componentIdRef.current,
-        EphemeralEvent,
-        setEphemeralEvent
-      );
-      container.off("connected", registerDDS);
-    };
-    // Wait until connected event to ensure we have the latest document
-    // and don't accidentally override a dds handle recently created
-    // by another client
-    if (container.connectionState === 2) {
-      registerDDS();
-    } else {
-      container.on("connected", registerDDS);
-    }
-    return () => {
-      // On unmount, unregister set state action and container connected listener
-      console.log("EphemeralEvent dds off");
-      unregisterDDSSetStateAction(_uniqueKey, componentIdRef.current);
-      container.off("connected", registerDDS);
-    };
-  }, [container]);
 
   /**
    * Setup change listeners and start `EphemeralEvent` if needed
@@ -157,7 +109,7 @@ export function useEphemeralEvent<TEvent extends object = object>(
       console.log("event received off");
       ephemeralEvent?.off(EphemeralEventEvents.received, onEventReceived);
     };
-  }, [ephemeralEvent, allowedRoles]);
+  }, [ephemeralEvent]);
 
   return {
     latestEvent,

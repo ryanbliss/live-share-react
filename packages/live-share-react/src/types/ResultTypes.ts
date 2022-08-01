@@ -6,6 +6,11 @@ import {
   IEphemeralEvent,
   PresenceState,
 } from "@microsoft/live-share";
+import {
+  CoordinationWaitPoint,
+  ExtendedMediaMetadata,
+  MediaPlayerSynchronizer,
+} from "@microsoft/live-share-media";
 import { IFluidContainer, SharedMap } from "fluid-framework";
 import { IReceiveEphemeralEvent } from "../interfaces";
 import {
@@ -85,9 +90,51 @@ export interface IUseEphemeralPresenceResults<TData extends object = object> {
   /**
    * Live Share `EphemeralPresence` object, should you want to use it directly.
    */
-  presence: EphemeralPresence<TData> | undefined;
+  ephemeralPresence: EphemeralPresence<TData> | undefined;
   /**
    * Callback method to update the local user's presence.
    */
   updatePresence: OnUpdateEphemeralPresenceAction<TData>;
+}
+
+export interface IUseMediaSynchronizerResults {
+  /**
+   * Stateful boolean on whether the session has an active suspension.
+   */
+  suspended: boolean;
+  /**
+   * Callback to initiate a play action for the group media session.
+   */
+  play: () => Promise<void>;
+  /**
+   * Callback to initiate a pause action for the group media session.
+   */
+  pause: () => void;
+  /**
+   * Callback to initiate a seek action for the group media session.
+   *
+   * @param time timestamp of the video in seconds to seek to
+   */
+  seekTo: (time: number) => void;
+  /**
+   * Callback to change the track for the group media session.
+   * @param track media metadata object, track src string, or null
+   */
+  setTrack: (track: Partial<ExtendedMediaMetadata> | string | null) => void;
+  /**
+   * Begin a new suspension. If a wait point is not set, the suspension will only impact the
+   * local user.
+   *
+   * @param waitPoint Optional. Point in track to set the suspension at.
+   * @see CoordinationWaitPoint
+   */
+  beginSuspension: (waitPoint?: CoordinationWaitPoint) => void;
+  /**
+   * End the currently active exception.
+   */
+  endSuspension: () => void;
+  /**
+   * Live Share `MediaPlayerSynchronizer` object, should you want to use it directly.
+   */
+  mediaSynchronizer: MediaPlayerSynchronizer | undefined;
 }
