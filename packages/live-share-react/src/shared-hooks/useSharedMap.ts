@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useFluidObjectsContext } from "../providers";
-import { v4 as uuid } from "uuid";
 import { SharedMap } from "fluid-framework";
 import { isEntries, isJSON, isMap } from "../utils";
 import { IUseSharedMapResults, SharedMapInitialData } from "../types";
+import { useDynamicDDS } from "../ephemeral-hooks";
 
 /**
  * Helper method for converting different initial data props into a Map<string, TData> to insert into the Fluid SharedMap
@@ -53,24 +52,28 @@ export function useSharedMap<TData extends object = object>(
    */
   const listeningRef = useRef(false);
   /**
-   * User facing: Stateful `SharedMap`, and non user-facing setter.
-   */
-  const [sharedMap, setSharedMap] = useState<SharedMap | undefined>();
-  /**
-   * Unique ID reference for the component.
-   */
-  const componentIdRef = useRef(uuid());
-  /**
    * Stateful readonly map (user facing) with most recent values from `SharedMap` and its setter method.
    */
   const [map, setMap] = useState<ReadonlyMap<string, TData>>(
     getInitialData<TData>(initialData)
   );
   /**
-   * Import container and DDS object register callbacks from FluidContextProvider.
+   * Callback method to set the `initialData` into the map when the `SharedMap` is first created.
+   * Only should be used as a prop to useDynamicDDS.
    */
-  const { container, registerDDSSetStateAction, unregisterDDSSetStateAction } =
-    useFluidObjectsContext();
+  const onFirstInitialize = useCallback((dds: SharedMap) => {
+    getInitialData(initialData).forEach((value, key) => {
+      dds.set(key, value);
+    });
+  }, []);
+  /**
+   * User facing: dynamically load the EphemeralEvent DDS for the given unique key.
+   */
+  const { dds: sharedMap } = useDynamicDDS<SharedMap>(
+    `<SharedMap>:${uniqueKey}`,
+    SharedMap,
+    onFirstInitialize
+  );
 
   /**
    * User facing: set a value to the Fluid `SharedMap`.
@@ -101,55 +104,6 @@ export function useSharedMap<TData extends object = object>(
     },
     [sharedMap]
   );
-
-  /**
-   * Once container is available, this effect will register the setter method so that the `SharedMap` loaded
-   * from `dynamicObjects` that matches `uniqueKey` can be passed back to this hook. If one does not yet exist,
-   * a new `SharedMap` is automatically created. If multiple users try to create a `SharedMap` at the same time when
-   * this component first mounts, `registerDDSSetStateAction` ensures that the hook will ultimately self correct.
-   *
-   * @see registerDDSSetStateAction to see how DDS handles are attached/created for the `SharedMap`.
-   * @see unregisterDDSSetStateAction to see how this component stops listening to changes in the DDS handles on unmount.
-   */
-  useEffect(() => {
-    if (!container) return;
-    // Add type as a prefix for the key provided by the developer. This helps prevent typing conflicts.
-    const _uniqueKey = `<SharedMap>:${uniqueKey}`;
-    // Callback method to set the `initialData` into the map when the `SharedMap` is first created.
-    const onFirstInitialize = (dds: SharedMap) => {
-      getInitialData(initialData).forEach((value, key) => {
-        dds.set(key, value);
-      });
-    };
-
-    // Callback method to register the setter for the `SharedMap`.
-    const registerDDS = () => {
-      registerDDSSetStateAction(
-        _uniqueKey,
-        componentIdRef.current,
-        SharedMap,
-        setSharedMap,
-        onFirstInitialize
-      );
-      container.off("connected", registerDDS);
-    };
-
-    if (container.connectionState === 2) {
-      // Container is already connected, register the DDS set state action
-      registerDDS();
-    } else {
-      // Wait until connected event to ensure we have the latest document and don't accidentally
-      // override a dds handle recently created by another client
-      container.on("connected", registerDDS);
-    }
-
-    return () => {
-      // On unmount, we stop listening for changes to `SharedMap`
-      unregisterDDSSetStateAction(_uniqueKey, componentIdRef.current);
-      // Also remove the connected listener, in case this component unmounts before container connects.
-      container.off("connected", registerDDS);
-    };
-  }, [container, initialData]);
 
   // Setup change listeners, initial values, etc.
   useEffect(() => {
