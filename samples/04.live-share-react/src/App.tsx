@@ -47,7 +47,6 @@ export default function App() {
         <ExampleEphemeralState
           waitingContent={
             <>
-              <h1>{"Welcome to Fluid React!"}</h1>
               <ExampleMediaSynchronizer />
               <ExampleEphemeralEvent />
             </>

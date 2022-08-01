@@ -28,7 +28,7 @@ export const ExampleEphemeralState: FC<IExampleEphemeralStateProps> = (
   const [state, data, setState] = useEphemeralState<
     ExampleAppState,
     IExampleData
-  >("CUSTOM-STATE-ID", ALLOWED_ROLES, ExampleAppState.WAITING, undefined);
+  >("CUSTOM-STATE-ID", ALLOWED_ROLES, ExampleAppState.WAITING);
 
   if (state === ExampleAppState.WAITING) {
     return (
@@ -45,6 +45,7 @@ export const ExampleEphemeralState: FC<IExampleEphemeralStateProps> = (
             {"Start"}
           </button>
         </div>
+        <h1>{"Welcome to Fluid React!"}</h1>
         {props.waitingContent}
       </div>
     );
