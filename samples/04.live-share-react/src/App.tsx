@@ -39,7 +39,11 @@ export default function App() {
   const shouldUseLiveShare = useRef(true);
   if (shouldUseLiveShare.current) {
     return (
-      <LiveShareContextProvider client={teamsClient} joinOnLoad={true}>
+      <LiveShareContextProvider
+        client={teamsClient}
+        joinOnLoad={true}
+        initializeTeamsSDKIfNeeded={true}
+      >
         <ExampleEphemeralState
           waitingContent={
             <>
