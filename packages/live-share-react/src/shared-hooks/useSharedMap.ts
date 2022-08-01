@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { SharedMap } from "fluid-framework";
 import { isEntries, isJSON, isMap } from "../utils";
 import { IUseSharedMapResults, SharedMapInitialData } from "../types";
-import { useDynamicDDS } from "../ephemeral-hooks";
+import { useDynamicDDS } from "./useDynamicDDS";
 
 /**
  * Helper method for converting different initial data props into a Map<string, TData> to insert into the Fluid SharedMap

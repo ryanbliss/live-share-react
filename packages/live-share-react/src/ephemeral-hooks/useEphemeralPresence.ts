@@ -5,7 +5,7 @@ import {
 } from "@microsoft/live-share";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IUseEphemeralPresenceResults } from "../types";
-import { useDynamicDDS } from "./useDynamicDDS";
+import { useDynamicDDS } from "../shared-hooks";
 
 /**
  * React hook for using a Live Share `EphemeralPresence`.
