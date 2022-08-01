@@ -8,6 +8,7 @@ import {
 import { TeamsFluidClient } from "@microsoft/live-share";
 import { FluidContext } from "./FluidContextProvider";
 import { getLiveShareContainerSchema } from "../utils";
+import { app } from "@microsoft/teams-js";
 
 interface ILiveShareContext {
   created: boolean | undefined;
@@ -28,13 +29,14 @@ export const useLiveShareContext = (): ILiveShareContext => {
 interface ILiveShareContextProviderProps {
   client: TeamsFluidClient;
   joinOnLoad?: boolean;
+  initializeTeamsSDKIfNeeded?: boolean;
   additionalDynamicObjectTypes?: LoadableObjectClass<any>[];
   children?: React.ReactNode;
 }
 
-export const LiveShareContextProvider: React.FC<ILiveShareContextProviderProps> = (
-  props
-) => {
+export const LiveShareContextProvider: React.FC<
+  ILiveShareContextProviderProps
+> = (props) => {
   const startedRef = React.useRef(false);
   const [results, setResults] = React.useState<
     ILiveShareContainerResults | undefined
@@ -49,6 +51,18 @@ export const LiveShareContextProvider: React.FC<ILiveShareContextProviderProps> 
       onInitializeContainer?: (container: IFluidContainer) => void
     ): Promise<ILiveShareContainerResults> => {
       return new Promise(async (resolve, reject) => {
+        if (!props.client.isTesting && !app.isInitialized()) {
+          if (props.initializeTeamsSDKIfNeeded === true) {
+            await app.initialize().catch((error) => reject(error));
+            app.notifySuccess();
+          } else {
+            reject(
+              new Error(
+                'Teams JS SDK is not initialized. To fix:\n\n  import { app } from "@microsoft/teams-js";\n  await app.initialize();\n\nOR\n\nSet the "initializeTeamsSDKIfNeeded" prop to true for the LiveShareContextProvider.'
+              )
+            );
+          }
+        }
         try {
           const results: ILiveShareContainerResults =
             await props.client.joinContainer(
@@ -58,21 +72,34 @@ export const LiveShareContextProvider: React.FC<ILiveShareContextProviderProps> 
           setResults(results);
           resolve(results);
         } catch (error: any) {
-          if (error instanceof Error) {
-            setJoinError(error);
-          }
           reject(error);
         }
       });
     },
-    [props.client, props.additionalDynamicObjectTypes, setResults]
+    [
+      props.client,
+      props.additionalDynamicObjectTypes,
+      props.initializeTeamsSDKIfNeeded,
+      setResults,
+    ]
   );
 
   React.useEffect(() => {
     if (results || startedRef.current) return;
     startedRef.current = true;
     if (props.joinOnLoad) {
-      joinContainer();
+      joinContainer().catch((error) => {
+        console.error(error);
+        if (error instanceof Error) {
+          setJoinError(error);
+        } else {
+          setJoinError(
+            new Error(
+              "LiveShareContextProvider: An unknown error occurred while joining container."
+            )
+          );
+        }
+      });
     }
   }, [results, props.joinOnLoad, joinContainer]);
 
