@@ -294,7 +294,7 @@ const ALLOWED_ROLES = [UserMeetingRole.organizer, UserMeetingRole.presenter];
 const INITIAL_TRACK =
   "https://storage.googleapis.com/media-session/big-buck-bunny/trailer.mov";
 
-export const ExampleMediaSynchronizer: FC = () => {
+export const ExampleMediaSynchronizer = () => {
   const videoRef = useRef(null);
   const { play, pause } = useMediaSynchronizer(
     "MEDIA-SESSION-ID",
@@ -342,9 +342,13 @@ import { useDynamicDDS } from "@microsoft/live-share-react";
 import { SharedTree } from "@fluid-experimental/tree";
 
 export function SharedTree({ uniqueId }) {
+  const onFirstInitialize () => {
+    // Set initial values for SharedTree, if needed
+  }
   const { dds: sharedTree } = useDynamicDDS(
     `<SharedTree>:${uniqueId}`,
-    SharedTree
+    SharedTree,
+    onFirstInitialize, // optional
   );
 
   if (sharedTree === undefined) {
