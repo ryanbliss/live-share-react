@@ -78,7 +78,6 @@ Since these keys are a `string` you provide while calling `useSharedState`, you 
 The following example shows how `useSharedState` can be used to dynamically create collaborative features in your app on the fly:
 
 ```javascript
-import { FC } from "react";
 import { useSharedState } from "@microsoft/live-share-react";
 
 export const CounterCard = ({ card, onDelete }) => {
@@ -122,7 +121,7 @@ While you write to keys individually, the `map` object exposed through the hook 
 import { useSharedMap } from "@microsoft/live-share-react";
 import { v4 as uuid } from "uuid";
 
-export const ExampleSharedMap: FC = () => {
+export const ExampleSharedMap = () => {
   const { map, setEntry, deleteEntry } = useSharedMap("CUSTOM-MAP-ID");
   return (
     <div>
@@ -157,8 +156,8 @@ export const ExampleSharedMap: FC = () => {
 Presence makes it easy to track which users are currently in the session and assign custom data to them. Unlike other hooks, `useEphemeralPresence` has a default ID set for you, but you can override it with your own if you'd like.
 
 ```javascript
-import { PresenceState } from "@microsoft/live-share";
 import { useEphemeralPresence } from "@microsoft/live-share-react";
+import { PresenceState } from "@microsoft/live-share";
 
 export const ExampleEphemeralPresence = () => {
   const { localUser, allUsers, updatePresence } = useEphemeralPresence(
@@ -200,7 +199,7 @@ This component also features role verification, which allows you to choose the T
 
 ```javascript
 import { useEphemeralState } from "@microsoft/live-share-react";
-import { EphemeralEvent, UserMeetingRole } from "@microsoft/live-share";
+import { UserMeetingRole } from "@microsoft/live-share";
 
 const ALLOWED_ROLES = [UserMeetingRole.organizer, UserMeetingRole.presenter ];
 
@@ -326,6 +325,7 @@ import { LiveShareContextProvider } from "@microsoft/live-share-react";
 import { SharedTree } from "@fluid-experimental/tree";
 
 export function App() {
+  // Pass in custom `additionalDynamicObjectTypes` prop using custom `IFluidLoadable`
   return (
     <LiveShareContextProvider
       joinOnLoad={true}
@@ -347,7 +347,7 @@ export function SharedTree({ uniqueId }) {
     SharedTree
   );
 
-  if (!sharedTree) {
+  if (sharedTree === undefined) {
     return <div>{"Loading..."}</div>;
   }
 
