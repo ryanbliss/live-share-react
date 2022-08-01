@@ -2,11 +2,10 @@ import { IFluidContainer, LoadableObjectClass } from "fluid-framework";
 import React from "react";
 import {
   AzureClient,
+  AzureClientProps,
   AzureContainerServices,
 } from "@fluidframework/azure-client";
-import {
-  IAzureContainerResults,
-} from "../types";
+import { IAzureContainerResults } from "../types";
 import {
   IDDSSetStateActionRegistryResponse,
   ISharedSetStateActionRegistryResponse,
@@ -27,7 +26,9 @@ interface IFluidContext
   ) => Promise<IAzureContainerResults>;
 }
 
-export const FluidContext = React.createContext<IFluidContext>({} as IFluidContext);
+export const FluidContext = React.createContext<IFluidContext>(
+  {} as IFluidContext
+);
 
 export const useFluidObjectsContext = (): IFluidContext => {
   const context = React.useContext(FluidContext);
@@ -35,7 +36,7 @@ export const useFluidObjectsContext = (): IFluidContext => {
 };
 
 interface IFluidContextProviderProps {
-  client: AzureClient;
+  clientOptions: AzureClientProps;
   containerId?: string;
   createOnLoad?: boolean;
   joinOnLoad?: boolean;
@@ -43,9 +44,14 @@ interface IFluidContextProviderProps {
   children?: React.ReactNode;
 }
 
-export const FluidContextProvider: React.FC<IFluidContextProviderProps> = (props) => {
+export const FluidContextProvider: React.FC<IFluidContextProviderProps> = (
+  props
+) => {
   const startedRef = React.useRef(false);
-  const [results, setResults] = React.useState<IAzureContainerResults | undefined>();
+  const clientRef = React.useRef(new AzureClient(props.clientOptions));
+  const [results, setResults] = React.useState<
+    IAzureContainerResults | undefined
+  >();
   const [joinError, setJoinError] = React.useState<Error | undefined>();
 
   const stateRegistryCallbacks = useSharedSetStateActionRegistry(results);
@@ -57,7 +63,7 @@ export const FluidContextProvider: React.FC<IFluidContextProviderProps> = (props
         try {
           console.log(containerId);
           const results: IAzureContainerResults =
-            await props.client.getContainer(
+            await clientRef.current.getContainer(
               containerId,
               getContainerSchema(props.additionalDynamicObjectTypes)
             );
@@ -71,12 +77,7 @@ export const FluidContextProvider: React.FC<IFluidContextProviderProps> = (props
         }
       });
     },
-    [
-      props.client,
-      props.containerId,
-      props.additionalDynamicObjectTypes,
-      setResults,
-    ]
+    [props.containerId, props.additionalDynamicObjectTypes, setResults]
   );
 
   const createContainer = React.useCallback(
@@ -86,7 +87,7 @@ export const FluidContextProvider: React.FC<IFluidContextProviderProps> = (props
       return new Promise(async (resolve, reject) => {
         try {
           const results: IAzureContainerResults =
-            await props.client.createContainer(
+            await clientRef.current.createContainer(
               getContainerSchema(props.additionalDynamicObjectTypes)
             );
           if (onInitializeContainer) {
@@ -104,7 +105,7 @@ export const FluidContextProvider: React.FC<IFluidContextProviderProps> = (props
         }
       });
     },
-    [props.client, props.containerId, setResults]
+    [props.containerId, setResults]
   );
 
   React.useEffect(() => {
@@ -117,7 +118,6 @@ export const FluidContextProvider: React.FC<IFluidContextProviderProps> = (props
     }
   }, [
     results,
-    props.client,
     props.containerId,
     props.createOnLoad,
     props.joinOnLoad,

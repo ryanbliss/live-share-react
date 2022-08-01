@@ -5,7 +5,10 @@ import {
   useDDSSetStateActionRegistry,
   useSharedSetStateActionRegistry,
 } from "../internal-hooks";
-import { TeamsFluidClient } from "@microsoft/live-share";
+import {
+  ITeamsFluidClientOptions,
+  TeamsFluidClient,
+} from "@microsoft/live-share";
 import { FluidContext } from "./FluidContextProvider";
 import { getLiveShareContainerSchema } from "../utils";
 import { app } from "@microsoft/teams-js";
@@ -27,7 +30,7 @@ export const useLiveShareContext = (): ILiveShareContext => {
 };
 
 interface ILiveShareContextProviderProps {
-  client: TeamsFluidClient;
+  clientOptions?: ITeamsFluidClientOptions;
   joinOnLoad?: boolean;
   initializeTeamsSDKIfNeeded?: boolean;
   additionalDynamicObjectTypes?: LoadableObjectClass<any>[];
@@ -38,6 +41,7 @@ export const LiveShareContextProvider: React.FC<
   ILiveShareContextProviderProps
 > = (props) => {
   const startedRef = React.useRef(false);
+  const clientRef = React.useRef(new TeamsFluidClient(props.clientOptions));
   const [results, setResults] = React.useState<
     ILiveShareContainerResults | undefined
   >();
@@ -51,7 +55,7 @@ export const LiveShareContextProvider: React.FC<
       onInitializeContainer?: (container: IFluidContainer) => void
     ): Promise<ILiveShareContainerResults> => {
       return new Promise(async (resolve, reject) => {
-        if (!props.client.isTesting && !app.isInitialized()) {
+        if (!clientRef.current.isTesting && !app.isInitialized()) {
           if (props.initializeTeamsSDKIfNeeded === true) {
             await app.initialize().catch((error) => reject(error));
             app.notifySuccess();
@@ -65,7 +69,7 @@ export const LiveShareContextProvider: React.FC<
         }
         try {
           const results: ILiveShareContainerResults =
-            await props.client.joinContainer(
+            await clientRef.current.joinContainer(
               getLiveShareContainerSchema(props.additionalDynamicObjectTypes),
               onInitializeContainer
             );
@@ -77,7 +81,6 @@ export const LiveShareContextProvider: React.FC<
       });
     },
     [
-      props.client,
       props.additionalDynamicObjectTypes,
       props.initializeTeamsSDKIfNeeded,
       setResults,
