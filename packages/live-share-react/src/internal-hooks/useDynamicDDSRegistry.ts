@@ -13,14 +13,14 @@ import {
   UnregisterDDSSetStateAction,
 } from "../types";
 
-export interface IDDSSetStateActionRegistryResponse {
+export interface IDynamicDDSRegistry {
   registerDDSSetStateAction: RegisterDDSSetStateAction;
   unregisterDDSSetStateAction: UnregisterDDSSetStateAction;
 }
 
-export const useDDSSetStateActionRegistry = (
+export const useDynamicDDSRegistry = (
   results: IAzureContainerResults | undefined
-): IDDSSetStateActionRegistryResponse => {
+): IDynamicDDSRegistry => {
   const registeredDDSSetStateActionMapRef = useRef<
     Map<string, Map<string, SetLocalStateAction>>
   >(new Map());

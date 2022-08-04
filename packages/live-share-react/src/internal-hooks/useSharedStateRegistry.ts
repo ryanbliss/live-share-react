@@ -9,16 +9,16 @@ import {
   UpdateSharedStateAction,
 } from "../types";
 
-export interface ISharedSetStateActionRegistryResponse {
+export interface ISharedStateRegistryResponse {
   registerSharedSetStateAction: RegisterSharedSetStateAction;
   unregisterSharedSetStateAction: UnregisterSharedSetStateAction;
   updateSharedState: UpdateSharedStateAction;
   deleteSharedState: DeleteSharedStateAction;
 }
 
-export const useSharedSetStateActionRegistry = (
+export const useSharedStateRegistry = (
   results: IAzureContainerResults | undefined
-): ISharedSetStateActionRegistryResponse => {
+): ISharedStateRegistryResponse => {
   const registeredSharedSetStateActionMapRef = useRef<
     Map<string, Map<string, SetLocalStateAction>>
   >(new Map());

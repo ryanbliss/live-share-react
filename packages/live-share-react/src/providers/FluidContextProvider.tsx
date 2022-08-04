@@ -7,16 +7,16 @@ import {
 } from "@fluidframework/azure-client";
 import { IAzureContainerResults } from "../types";
 import {
-  IDDSSetStateActionRegistryResponse,
-  ISharedSetStateActionRegistryResponse,
-  useDDSSetStateActionRegistry,
-  useSharedSetStateActionRegistry,
+  IDynamicDDSRegistry,
+  ISharedStateRegistryResponse,
+  useDynamicDDSRegistry,
+  useSharedStateRegistry,
 } from "../internal-hooks";
 import { getContainerSchema } from "../utils";
 
 interface IFluidContext
-  extends ISharedSetStateActionRegistryResponse,
-    IDDSSetStateActionRegistryResponse {
+  extends ISharedStateRegistryResponse,
+    IDynamicDDSRegistry {
   container: IFluidContainer | undefined;
   services: AzureContainerServices | undefined;
   joinError: Error | undefined;
@@ -54,8 +54,8 @@ export const FluidContextProvider: React.FC<IFluidContextProviderProps> = (
   >();
   const [joinError, setJoinError] = React.useState<Error | undefined>();
 
-  const stateRegistryCallbacks = useSharedSetStateActionRegistry(results);
-  const ddsRegistryCallbacks = useDDSSetStateActionRegistry(results);
+  const stateRegistryCallbacks = useSharedStateRegistry(results);
+  const ddsRegistryCallbacks = useDynamicDDSRegistry(results);
 
   const getContainer = React.useCallback(
     async (containerId: string): Promise<IAzureContainerResults> => {

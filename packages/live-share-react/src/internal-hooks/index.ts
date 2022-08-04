@@ -1,2 +1,2 @@
-export * from "./useSharedSetStateActionRegistry";
-export * from "./useDDSSetStateActionRegistry";
+export * from "./useSharedStateRegistry";
+export * from "./useDynamicDDSRegistry";
