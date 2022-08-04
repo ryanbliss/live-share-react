@@ -2,8 +2,8 @@ import { IFluidContainer, LoadableObjectClass } from "fluid-framework";
 import React from "react";
 import { ILiveShareContainerResults } from "../types";
 import {
-  useDDSSetStateActionRegistry,
-  useSharedSetStateActionRegistry,
+  useDynamicDDSRegistry,
+  useSharedStateRegistry,
 } from "../internal-hooks";
 import {
   ITeamsFluidClientOptions,
@@ -47,8 +47,8 @@ export const LiveShareContextProvider: React.FC<
   >();
   const [joinError, setJoinError] = React.useState<Error | undefined>();
 
-  const stateRegistryCallbacks = useSharedSetStateActionRegistry(results);
-  const ddsRegistryCallbacks = useDDSSetStateActionRegistry(results);
+  const stateRegistryCallbacks = useSharedStateRegistry(results);
+  const ddsRegistryCallbacks = useDynamicDDSRegistry(results);
 
   const joinContainer = React.useCallback(
     async (
