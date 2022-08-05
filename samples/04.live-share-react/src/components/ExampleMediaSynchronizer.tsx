@@ -1,6 +1,10 @@
 import { UserMeetingRole } from "@microsoft/live-share";
 import { FC, useCallback, useEffect, useRef } from "react";
 import { useMediaSynchronizer } from "@microsoft/live-share-react";
+import {
+  IMediaPlayerSynchronizerEvent,
+  MediaPlayerSynchronizerEvents,
+} from "@microsoft/live-share-media";
 
 const ALLOWED_ROLES = [UserMeetingRole.organizer, UserMeetingRole.presenter];
 
@@ -9,7 +13,7 @@ const INITIAL_TRACK =
 
 export const ExampleMediaSynchronizer: FC = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const { mediaSynchronizer, play, pause, seekTo } = useMediaSynchronizer(
+  const { play, pause, seekTo, mediaSynchronizer } = useMediaSynchronizer(
     "MEDIA-SESSION-ID",
     videoRef,
     INITIAL_TRACK,
@@ -17,27 +21,43 @@ export const ExampleMediaSynchronizer: FC = () => {
   );
 
   useEffect(() => {
-    // TODO: remove this once MediaPlayerSynchronizer adheres to promise
-    // spec of play, pause, etc.
-    if (mediaSynchronizer && !mediaSynchronizer.player.muted) {
-      mediaSynchronizer.player.muted = true;
-    }
+    // Listen for player group actions for errors (e.g., play error)
+    const onGroupAction = (evt: IMediaPlayerSynchronizerEvent) => {
+      if (evt.error) {
+        if (
+          videoRef.current &&
+          evt.details.action === "play" &&
+          evt.error.name === "NotAllowedError"
+        ) {
+          // The user has not interacted with the document so the browser blocked the play action
+          // mute the player and try again
+          videoRef.current.muted = true;
+          videoRef.current.play();
+        } else {
+          console.error(evt.error);
+        }
+      }
+    };
+    mediaSynchronizer?.addEventListener(
+      MediaPlayerSynchronizerEvents.groupaction,
+      onGroupAction
+    );
+    return () => {
+      mediaSynchronizer?.removeEventListener(
+        MediaPlayerSynchronizerEvents.groupaction,
+        onGroupAction
+      );
+    };
   }, [mediaSynchronizer]);
 
   const onTogglePlayPause = useCallback(() => {
     console.log("onClickTogglePlayPause", videoRef.current?.paused);
     if (videoRef.current?.paused) {
-      play().catch((_) => {
-        if (mediaSynchronizer && mediaSynchronizer.player.paused) {
-          // Was unable to play, probably because of autoplay policy
-          mediaSynchronizer.player.muted = true;
-          play();
-        }
-      });
+      play();
     } else {
       pause();
     }
-  }, [play, pause, mediaSynchronizer]);
+  }, [play, pause]);
 
   return (
     <>
