@@ -5,7 +5,13 @@ import {
   EphemeralTimer,
 } from "@microsoft/live-share";
 import { EphemeralMediaSession } from "@microsoft/live-share-media";
-import { ContainerSchema, LoadableObjectClass, SharedDirectory, SharedMap, SharedString } from "fluid-framework";
+import {
+  ContainerSchema,
+  LoadableObjectClass,
+  SharedDirectory,
+  SharedMap,
+  SharedString,
+} from "fluid-framework";
 
 const schema: ContainerSchema = {
   initialObjects: {
