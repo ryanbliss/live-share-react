@@ -105,7 +105,7 @@ export interface IUseMediaSynchronizerResults {
   /**
    * Callback to initiate a play action for the group media session.
    */
-  play: () => Promise<void>;
+  play: () => void;
   /**
    * Callback to initiate a pause action for the group media session.
    */

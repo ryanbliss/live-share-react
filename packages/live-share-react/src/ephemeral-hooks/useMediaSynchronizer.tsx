@@ -47,15 +47,8 @@ export function useMediaSynchronizer(
   /**
    * User facing: play callback
    */
-  const play = useCallback((): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      try {
-        mediaSynchronizer!.play();
-        resolve();
-      } catch (error) {
-        reject(error);
-      }
-    });
+  const play = useCallback((): void => {
+    mediaSynchronizer?.play();
   }, [mediaSynchronizer]);
 
   /**
@@ -167,6 +160,7 @@ export function useMediaSynchronizer(
     return () => {
       listeningRef.current = false;
       console.log("mediaSynchronizer off");
+      synchronizer.removeAllListeners();
       mediaSession.removeAllListeners();
       synchronizer?.end();
     };
