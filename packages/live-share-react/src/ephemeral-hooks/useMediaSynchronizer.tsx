@@ -137,9 +137,9 @@ export function useMediaSynchronizer(
       synchronizer.viewOnly = viewOnly;
     }
 
-    if (!mediaSession.isStarted) {
+    if (!mediaSession.isInitialized) {
       // Start synchronizing the media session
-      mediaSession.start(allowedRoles ?? []);
+      mediaSession.initialize(allowedRoles ?? []);
     } else if (initialTrack) {
       // If we have already started the media session, the synchronizer won't have initial track
       // data now that we are remounting.

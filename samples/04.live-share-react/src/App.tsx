@@ -16,12 +16,11 @@ import {
 } from "./components";
 
 const localConnection: AzureConnectionConfig = {
-  tenantId: "local",
+  type: "local",
   tokenProvider: new InsecureTokenProvider("", {
     id: "123",
   }),
-  orderer: "http://localhost:7070",
-  storage: "http://localhost:7070",
+  endpoint: "http://localhost:7070",
 };
 const azureClientOptions = {
   connection: localConnection,

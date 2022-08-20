@@ -98,9 +98,9 @@ export function useEphemeralEvent<TEvent extends object = object>(
     };
     console.log("event received on");
     ephemeralEvent.on(EphemeralEventEvents.received, onEventReceived);
-    if (!ephemeralEvent.isStarted) {
+    if (!ephemeralEvent.isInitialized) {
       // Start ephemeral event
-      ephemeralEvent.start(allowedRoles);
+      ephemeralEvent.initialize(allowedRoles);
     }
 
     return () => {

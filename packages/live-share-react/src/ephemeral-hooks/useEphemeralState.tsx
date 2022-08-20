@@ -43,7 +43,7 @@ export function useEphemeralState<
         );
         return;
       }
-      if (!ephemeralState.isStarted) {
+      if (!ephemeralState.isInitialized) {
         console.error(
           new Error(
             "Cannot call changeState while ephemeralState is not started"
@@ -70,9 +70,9 @@ export function useEphemeralState<
     };
     console.log("stateChanged on");
     ephemeralState.on("stateChanged", onStateChanged);
-    if (!ephemeralState.isStarted) {
+    if (!ephemeralState.isInitialized) {
       console.log("starting EphemeralState");
-      ephemeralState.start(allowedRoles, initialState, initialData);
+      ephemeralState.initialize(allowedRoles, initialState, initialData);
       if (ephemeralState.state) {
         onStateChanged(ephemeralState.state as TState, ephemeralState.data);
       }

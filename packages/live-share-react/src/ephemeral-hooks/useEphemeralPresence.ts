@@ -71,7 +71,7 @@ export function useEphemeralPresence<TData extends object = object>(
         );
         return;
       }
-      if (!ephemeralPresence.isStarted) {
+      if (!ephemeralPresence.isInitialized) {
         console.error(
           new Error("Cannot call updatePresence while presence is not started")
         );
@@ -99,9 +99,9 @@ export function useEphemeralPresence<TData extends object = object>(
     console.log("presenceChanged on");
     ephemeralPresence.on("presenceChanged", onPresenceChanged);
 
-    if (!ephemeralPresence.isStarted) {
+    if (!ephemeralPresence.isInitialized) {
       console.log("starting presence");
-      ephemeralPresence.start(userId, initialData, initialPresenceState);
+      ephemeralPresence.initialize(userId, initialData, initialPresenceState);
     } else {
       console.log("presence already started, updating local cache");
       onPresenceChanged();
