@@ -121,7 +121,7 @@ While you write to keys individually, the `map` object exposed through the hook 
 import { useSharedMap } from "@microsoft/live-share-react";
 import { v4 as uuid } from "uuid";
 
-export function ExampleSharedMap() {
+export function CardList() {
   const { map, setEntry, deleteEntry } = useSharedMap("CUSTOM-MAP-ID");
   return (
     <div>
@@ -159,7 +159,7 @@ Presence makes it easy to track which users are currently in the session and ass
 import { useEphemeralPresence } from "@microsoft/live-share-react";
 import { PresenceState } from "@microsoft/live-share";
 
-export function ExampleEphemeralPresence() {
+export function OnlineUsers() {
   const { localUser, allUsers, updatePresence } = useEphemeralPresence(
     "CUSTOM-USER-ID", // optional user id
     { name: "First Last" } // optional custom data object
@@ -203,7 +203,7 @@ import { UserMeetingRole } from "@microsoft/live-share";
 
 const ALLOWED_ROLES = [UserMeetingRole.organizer, UserMeetingRole.presenter ];
 
-export function ExampleEphemeralState() {
+export function AppState() {
   const [state, data, setState] = useEphemeralState("CUSTOM-STATE-ID", ALLOWED_ROLES, ExampleAppState.WAITING);
 
   if (state === ExampleAppState.WAITING) {
@@ -246,7 +246,7 @@ Here is a simple example:
 ```javascript
 import { useEphemeralEvent } from "@microsoft/live-share-react";
 
-export function ExampleEphemeralEvent() {
+export function Reactions() {
   const { latestEvent, sendEvent } = useEphemeralEvent("EVENT-ID");
 
   return (
@@ -294,7 +294,7 @@ const ALLOWED_ROLES = [UserMeetingRole.organizer, UserMeetingRole.presenter];
 const INITIAL_TRACK =
   "https://storage.googleapis.com/media-session/big-buck-bunny/trailer.mov";
 
-export function ExampleMediaSynchronizer() {
+export function VideoPlayer() {
   const videoRef = useRef(null);
   const { play, pause } = useMediaSynchronizer(
     "MEDIA-SESSION-ID",
@@ -332,16 +332,16 @@ export function App() {
       initializeTeamsSDKIfNeeded={true}
       additionalDynamicObjectTypes={[SharedTree]}
     >
-      <SharedTree uniqueId="MY-TREE-ID" />
+      <ExampleSharedTree uniqueId="MY-TREE-ID" />
     </LiveShareContextProvider>
   );
 }
 
-// SharedTree.jsx
+// ExampleSharedTree.jsx
 import { useDynamicDDS } from "@microsoft/live-share-react";
 import { SharedTree } from "@fluid-experimental/tree";
 
-export function SharedTree({ uniqueId }) {
+export function ExampleSharedTree({ uniqueId }) {
   const onFirstInitialize () => {
     // Set initial values for SharedTree, if needed
   }
